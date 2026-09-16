@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineCounter - Ticket Pricing</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="page">
+
+    <!-- Header -->
+    <header class="header">
+        <div>
+            <p class="brand">CINECOUNTER</p>
+            <h1>Ticket Pricing & Billing</h1>
+            <p class="subtitle">Smart pricing for your cinema counter</p>
+        </div>
+
+        <div class="status">
+            <span class="status-dot"></span>
+            Counter Online
+        </div>
+    </header>
+
+
+    <main class="dashboard">
+
+        <!-- Left: Ticket Selection -->
+        <section class="selection-panel">
+
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">BOOKING</p>
+                    <h2>Select Tickets</h2>
+                </div>
+
+                <div class="ticket-count">
+                    <span id="ticketCount">0</span> Tickets
+                </div>
+            </div>
+
+
+            <div class="ticket-grid">
+
+                {% for tier, details in tiers.items() %}
+
+                <div class="ticket-card">
+
+                    <div class="card-top">
+                        <div>
+                            <h3>{{ tier }}</h3>
+                            <p class="price">₹{{ "%.2f"|format(details.price) }}</p>
+                            <p class="per-ticket">per ticket</p>
+                        </div>
+
+                        <div class="ticket-icon">
+                            {% if tier == "Silver" %}
+                                S
+                            {% elif tier == "Gold" %}
+                                G
+                            {% else %}
+                                R
+                            {% endif %}
+                        </div>
+                    </div>
+
+
+                    <div class="availability">
+                        <span>Available seats</span>
+
+                        <strong>
+                            {{ details.available }}
+                        </strong>
+                    </div>
+
+
+                    <div class="quantity-control">
+
+                        <button
+                            type="button"
+                            class="quantity-btn"
+                            onclick="changeQuantity('{{ tier }}', -1)">
+                            −
+                        </button>
+
+                        <span id="{{ tier }}Quantity">
+                            {{ quantities[tier] }}
+                        </span>
+
+                        <button
+                            type="button"
+                            class="quantity-btn"
+                            onclick="changeQuantity('{{ tier }}', 1)">
+                            +
+                        </button>
+
+                    </div>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+
+            <!-- Membership -->
+            <div class="membership-box">
+
+                <div>
+                    <p class="eyebrow">MEMBERSHIP</p>
+                    <h3>Are you a CineCounter member?</h3>
+                    <p class="helper">
+                        Members receive 10% off, capped at ₹100.
+                    </p>
+                </div>
+
+                <div class="member-toggle">
+
+                    <label>
+                        <input
+                            type="radio"
+                            name="member"
+                            value="no"
+                            checked>
+                        <span>Non-Member</span>
+                    </label>
+
+                    <label>
+                        <input
+                            type="radio"
+                            name="member"
+                            value="yes">
+                        <span>Member</span>
+                    </label>
+
+                </div>
+
+            </div>
+
+
+            <!-- Actions -->
+            <div class="actions">
+
+                <button
+                    type="button"
+                    class="clear-btn"
+                    onclick="clearBooking()">
+                    Clear
+                </button>
+
+                <button
+                    type="button"
+                    class="calculate-btn"
+                    onclick="calculateBill()">
+                    Calculate Bill
+                    <span>→</span>
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- Right: Bill -->
+        <section class="bill-panel">
+
+            <div class="bill-header">
+                <div>
+                    <p class="eyebrow">SUMMARY</p>
+                    <h2>Your Bill</h2>
+                </div>
+
+                <div class="receipt-icon">▤</div>
+            </div>
+
+
+            <div id="errorBox" class="error-box" style="display: none;"></div>
+
+
+            <div id="billContent">
+
+                <div class="empty-bill">
+
+                    <div class="empty-icon">₹</div>
+
+                    <h3>Your bill will appear here</h3>
+
+                    <p>
+                        Select your tickets and click
+                        <strong>Calculate Bill</strong>.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <footer>
+        <span>Secure Pricing Engine</span>
+        <span>•</span>
+        <span>All amounts calculated to exact paisa</span>
+    </footer>
+
+</div>
+
+
+<script>
+
+    const tiers = {
+        {% for tier, details in tiers.items() %}
+        "{{ tier }}": {
+            price: {{ details.price }},
+            available: {{ details.available }}
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    };
+
+
+    let quantities = {
+        "Silver": 0,
+        "Gold": 0,
+        "Recliner": 0
+    };
+
+
+    function changeQuantity(tier, change) {
+
+        let newQuantity = quantities[tier] + change;
+
+        if (newQuantity < 0) {
+            newQuantity = 0;
+        }
+
+        if (newQuantity > tiers[tier].available) {
+            showError(
+                `Only ${tiers[tier].available} ${tier} ticket(s) are available.`
+            );
+            return;
+        }
+
+        quantities[tier] = newQuantity;
+
+        document.getElementById(
+            tier + "Quantity"
+        ).textContent = newQuantity;
+
+        updateTicketCount();
+        hideError();
+    }
+
+
+    function updateTicketCount() {
+
+        let total = 0;
+
+        for (let tier in quantities) {
+            total += quantities[tier];
+        }
+
+        document.getElementById("ticketCount").textContent = total;
+    }
+
+
+    function calculateBill() {
+
+        let form = document.createElement("form");
+
+        form.method = "POST";
+        form.action = "/";
+
+        for (let tier in quantities) {
+
+            let input = document.createElement("input");
+
+            input.type = "hidden";
+            input.name = tier;
+            input.value = quantities[tier];
+
+            form.appendChild(input);
+        }
+
+
+        let member = document.querySelector(
+            'input[name="member"]:checked'
+        );
+
+        let memberInput = document.createElement("input");
+
+        memberInput.type = "hidden";
+        memberInput.name = "member";
+        memberInput.value = member ? member.value : "no";
+
+        form.appendChild(memberInput);
+
+        document.body.appendChild(form);
+
+        form.submit();
+    }
+
+
+    function clearBooking() {
+
+        quantities = {
+            "Silver": 0,
+            "Gold": 0,
+            "Recliner": 0
+        };
+
+        for (let tier in quantities) {
+
+            document.getElementById(
+                tier + "Quantity"
+            ).textContent = "0";
+        }
+
+        document.querySelector(
+            'input[value="no"]'
+        ).checked = true;
+
+        updateTicketCount();
+        hideError();
+
+        window.location.href = "/";
+    }
+
+
+    function showError(message) {
+
+        let errorBox = document.getElementById("errorBox");
+
+        errorBox.textContent = "⚠ " + message;
+        errorBox.style.display = "block";
+    }
+
+
+    function hideError() {
+
+        document.getElementById(
+            "errorBox"
+        ).style.display = "none";
+    }
+
+
+    {% if error %}
+        showError({{ error|tojson }});
+    {% endif %}
+
+
+    {% if bill %}
+
+        quantities = {
+            {% for tier in tiers %}
+            "{{ tier }}": {{ quantities[tier] }}{% if not loop.last %},{% endif %}
+            {% endfor %}
+        };
+
+        document.getElementById("billContent").innerHTML = `
+            <div class="bill-details">
+
+                <div class="bill-items">
+
+                    {% for ticket in bill.tickets %}
+                    <div class="bill-row">
+                        <span>
+                            {{ ticket.tier }}
+                            <small>× {{ ticket.quantity }}</small>
+                        </span>
+
+                        <strong>
+                            ₹{{ "%.2f"|format(ticket.line_total) }}
+                        </strong>
+                    </div>
+                    {% endfor %}
+
+                </div>
+
+
+                <div class="bill-divider"></div>
+
+
+                <div class="bill-row">
+                    <span>Ticket Subtotal</span>
+                    <strong>₹{{ "%.2f"|format(bill.ticket_subtotal) }}</strong>
+                </div>
+
+                <div class="bill-row discount">
+                    <span>Festival Discount</span>
+                    <strong>-₹{{ "%.2f"|format(bill.festival_discount) }}</strong>
+                </div>
+
+                <div class="bill-row discount">
+                    <span>Member Discount</span>
+                    <strong>-₹{{ "%.2f"|format(bill.member_discount) }}</strong>
+                </div>
+
+
+                <div class="bill-row">
+                    <span>After Discounts</span>
+                    <strong>₹{{ "%.2f"|format(bill.subtotal_after_discounts) }}</strong>
+                </div>
+
+                <div class="bill-row">
+                    <span>Convenience Fee</span>
+                    <strong>₹{{ "%.2f"|format(bill.convenience_fee) }}</strong>
+                </div>
+
+                <div class="bill-row">
+                    <span>GST</span>
+                    <strong>₹{{ "%.2f"|format(bill.gst) }}</strong>
+                </div>
+
+
+                <div class="bill-divider"></div>
+
+
+                <div class="total-row">
+                    <div>
+                        <span>Final Total</span>
+                        <small>Inclusive of GST</small>
+                    </div>
+
+                    <strong>
+                        ₹{{ "%.2f"|format(bill.final_total) }}
+                    </strong>
+                </div>
+
+            </div>
+        `;
+
+    {% endif %}
+
+
+    updateTicketCount();
+
+</script>
+
+</body>
+</html>

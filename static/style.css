@@ -1,0 +1,444 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+    color: #1f2937;
+    min-height: 100vh;
+}
+
+.page {
+    max-width: 1250px;
+    margin: auto;
+    padding: 35px 25px;
+}
+
+
+/* Header */
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 35px;
+}
+
+.brand {
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 3px;
+    margin-bottom: 8px;
+}
+
+.header h1 {
+    font-size: 34px;
+    margin-bottom: 7px;
+}
+
+.subtitle {
+    color: #6b7280;
+}
+
+.status {
+    background: white;
+    padding: 12px 18px;
+    border-radius: 30px;
+    font-size: 14px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+}
+
+.status-dot {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    background: #22c55e;
+    border-radius: 50%;
+    margin-right: 7px;
+}
+
+
+/* Main layout */
+
+.dashboard {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 25px;
+}
+
+.selection-panel,
+.bill-panel {
+    background: white;
+    border-radius: 18px;
+    padding: 28px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+}
+
+.section-heading,
+.bill-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.eyebrow {
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    color: #6b7280;
+    margin-bottom: 6px;
+}
+
+h2 {
+    font-size: 24px;
+}
+
+.ticket-count {
+    background: #f3f4f6;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+}
+
+.ticket-count span {
+    font-weight: bold;
+}
+
+
+/* Ticket cards */
+
+.ticket-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.ticket-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 15px;
+    padding: 18px;
+    transition: 0.2s;
+}
+
+.ticket-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+.card-top {
+    display: flex;
+    justify-content: space-between;
+}
+
+.ticket-card h3 {
+    font-size: 16px;
+    margin-bottom: 7px;
+}
+
+.price {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.per-ticket {
+    color: #9ca3af;
+    font-size: 11px;
+}
+
+.ticket-icon {
+    width: 35px;
+    height: 35px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #f3f4f6;
+    font-weight: bold;
+}
+
+.availability {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0 14px;
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.availability strong {
+    color: #1f2937;
+}
+
+
+/* Quantity */
+
+.quantity-control {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 5px;
+}
+
+.quantity-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 7px;
+    background: #f3f4f6;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+.quantity-btn:hover {
+    background: #e5e7eb;
+}
+
+
+/* Membership */
+
+.membership-box {
+    margin-top: 25px;
+    padding: 20px;
+    border-radius: 14px;
+    background: #f8fafc;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+
+.membership-box h3 {
+    font-size: 15px;
+    margin-bottom: 5px;
+}
+
+.helper {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.member-toggle {
+    display: flex;
+    background: #e5e7eb;
+    padding: 4px;
+    border-radius: 10px;
+}
+
+.member-toggle label {
+    cursor: pointer;
+}
+
+.member-toggle input {
+    display: none;
+}
+
+.member-toggle span {
+    display: block;
+    padding: 9px 13px;
+    font-size: 12px;
+    border-radius: 7px;
+}
+
+.member-toggle input:checked + span {
+    background: white;
+    font-weight: bold;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+
+/* Buttons */
+
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.clear-btn,
+.calculate-btn {
+    border: none;
+    padding: 13px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.clear-btn {
+    background: #f3f4f6;
+}
+
+.calculate-btn {
+    background: #111827;
+    color: white;
+}
+
+.calculate-btn span {
+    margin-left: 12px;
+}
+
+
+/* Bill */
+
+.receipt-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.empty-bill {
+    text-align: center;
+    padding: 70px 20px;
+    color: #6b7280;
+}
+
+.empty-icon {
+    margin: auto auto 15px;
+    width: 55px;
+    height: 55px;
+    border-radius: 15px;
+    background: #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+}
+
+.empty-bill h3 {
+    color: #374151;
+    margin-bottom: 8px;
+}
+
+.empty-bill p {
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+
+/* Bill rows */
+
+.bill-items {
+    margin-bottom: 18px;
+}
+
+.bill-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 9px 0;
+    font-size: 14px;
+}
+
+.bill-row small {
+    color: #9ca3af;
+    margin-left: 5px;
+}
+
+.bill-row.discount {
+    color: #15803d;
+}
+
+.bill-divider {
+    border-top: 1px dashed #d1d5db;
+    margin: 12px 0;
+}
+
+.total-row {
+    margin-top: 8px;
+    padding: 18px;
+    border-radius: 13px;
+    background: #f3f4f6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.total-row span {
+    display: block;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.total-row small {
+    display: block;
+    margin-top: 4px;
+    color: #6b7280;
+}
+
+.total-row strong {
+    font-size: 24px;
+}
+
+
+/* Error */
+
+.error-box {
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    font-size: 13px;
+}
+
+
+/* Footer */
+
+footer {
+    text-align: center;
+    margin-top: 25px;
+    color: #9ca3af;
+    font-size: 11px;
+}
+
+footer span {
+    margin: 0 5px;
+}
+
+
+/* Responsive */
+
+@media (max-width: 900px) {
+
+    .dashboard {
+        grid-template-columns: 1fr;
+    }
+
+    .ticket-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .header {
+        align-items: flex-start;
+        gap: 20px;
+        flex-direction: column;
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .page {
+        padding: 20px 12px;
+    }
+
+    .selection-panel,
+    .bill-panel {
+        padding: 20px;
+    }
+
+    .membership-box {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+}
