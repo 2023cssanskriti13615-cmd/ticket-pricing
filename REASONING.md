@@ -1,70 +1,75 @@
-# Solution Reasoning
 
-## 1. Problem Understanding
+### 4. `REASONING.md`
 
-The project is a reusable multiplex ticket pricing and billing system.
+```markdown
+# Reasoning and Design Decisions
 
-The system supports multiple ticket tiers and calculates the final bill after applying applicable discounts, convenience fees, and GST.
+## Problem Understanding
 
-The main requirements handled by the pricing engine are:
+The goal is to build a reusable multiplex pricing engine that can calculate an accurate ticket bill for different seat tiers and booking situations.
 
-- Multiple ticket tiers
-- Ticket price and seat availability
-- Ticket quantity validation
-- Seat availability validation
-- Festival discount
-- Member percentage discount
-- Member discount cap
-- Per-ticket convenience fee
-- GST calculation
-- Accurate monetary calculations
-- Detailed billing information
+The engine must handle:
 
-## 2. Project Architecture
+- Different ticket prices
+- Seat availability
+- Festival discounts
+- Member discounts
+- Convenience fees
+- GST
+- Exact monetary calculations
+- A messy real-world seat-class price list
 
-The project separates the pricing logic from the user interface.
+## Architecture
 
-### `pricing_engine.py`
+The solution uses a `PricingEngine` class in `pricing_engine.py`.
 
-This file contains the `PricingEngine` class and all core pricing and validation logic.
+The class has two main responsibilities:
 
-### `app.py`
+1. Import and clean seat-class price data.
+2. Calculate the final booking bill using the cleaned configuration.
 
-This provides the command-line version of the application.
+## Messy Price List Cleaning
 
-### `web_app.py`
+Real-world input may contain inconsistent data.
 
-This provides the Flask-based web interface and uses the same pricing engine.
+The importer therefore:
 
-### `templates/index.html`
+1. Removes whitespace from seat-class names.
+2. Converts seat-class names to lowercase.
+3. Converts supported money formats into `Decimal`.
+4. Rejects blank prices.
+5. Rejects invalid price values.
+6. Rejects negative prices.
+7. Detects duplicate seat-class names after normalization.
+8. Produces a report containing imported, de-duplicated and rejected records.
 
-This contains the structure of the web interface.
+## Duplicate Handling
 
-### `static/style.css`
+Duplicate names are identified after case normalization.
 
-This contains the styling and responsive layout.
+For example:
 
-### `tests/test_pricing.py`
+- `Silver`
+- `silver`
+- `SILVER`
 
-This contains automated unit tests for the pricing engine.
+are treated as the same seat class.
 
-## 3. Pricing Calculation Flow
+The first valid occurrence is retained and later duplicates are reported as de-duplicated.
 
-The pricing engine follows this sequence:
+## Pricing Calculation
+
+The calculation order is:
 
 ```text
 Ticket Subtotal
-       ↓
+        ↓
 Festival Discount
-       ↓
+        ↓
 Member Discount
-       ↓
-Amount After Discounts
-       ↓
+        ↓
 Convenience Fee
-       ↓
-Taxable Amount
-       ↓
+        ↓
 GST
-       ↓
+        ↓
 Final Total
