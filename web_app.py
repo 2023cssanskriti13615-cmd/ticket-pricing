@@ -1,3 +1,4 @@
+
 from flask import Flask, render_template, request
 from pricing_engine import PricingEngine
 
@@ -47,26 +48,31 @@ def home():
 
     if request.method == "POST":
         try:
+            # Read ticket quantities
             for tier in TIER_CONFIG:
                 quantities[tier] = int(
                     request.form.get(tier, 0)
                 )
 
+            # Read membership status
             member_value = request.form.get("member", "no")
             is_member = member_value == "yes"
 
+            # Create booking dictionary
             booking = {
                 tier: quantity
                 for tier, quantity in quantities.items()
                 if quantity > 0
             }
 
+            # Make sure at least one ticket is selected
             if not booking:
                 raise ValueError(
                     "Please select at least one ticket."
                 )
 
-            bill = engine.calculate_bill(
+            # Book tickets and update remaining availability
+            bill = engine.book_tickets(
                 booking=booking,
                 is_member=is_member
             )
